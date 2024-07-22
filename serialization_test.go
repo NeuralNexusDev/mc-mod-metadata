@@ -134,8 +134,7 @@ func TestFabricDeserialization(t *testing.T) {
 }
 
 func TestForgeLegacyMod(t *testing.T) {
-	forgeLegacyString := `{[
-  {
+	forgeLegacyString := `[{
     "modid": "taterlib",
     "name": "TaterLib",
     "license": "GPL-3.0",
@@ -153,8 +152,7 @@ func TestForgeLegacyMod(t *testing.T) {
     "useDependencyInformation": true,
     "dependencies": [],
     "dependants": []
-  }
-]`
+}]`
 
 	forgeLegacyMod, err := mcmodmeta.NewForgeLegacyMod(forgeLegacyString)
 
@@ -180,36 +178,28 @@ func TestForgeLegacyMod(t *testing.T) {
 func TestForgeMod(t *testing.T) {
 	forgeModString := `
 	modLoader = "javafml"
-loaderVersion = "${loader_version_range}"
-license = "${license}"
-issueTrackerURL = "${issue_tracker_url}"
+loaderVersion = "[1,)"
+license = "GPL-3.0"
+issueTrackerURL = "https://some.issue.tracker"
 
 [[mods]]
-modId = "${project_id}"
-version = "${version}"
-displayName = "${project_name}"
-updateJSONURL = "${update_json_url}"
-displayURL = "${homepage_url}"
-logoFile = "${project_name}.png.gz"
-credits = "${authors}"
-authors = "${authors}"
+modId = "taterlib"
+version = "0.1.0"
+displayName = "TaterLib"
+updateJSONURL = "https://some.update.url"
+displayURL = "https://some.homepage.url"
+logoFile = "TaterLib.png.gz"
+credits = "p0t4t0sandwich"
+authors = "p0t4t0sandwich"
 displayTest = "IGNORE_SERVER_VERSION"
-description = '''${project_description}'''
+description = '''some more word stuffs'''
 
 # Forge Dependency
 [[dependencies.TaterLib]]
 modId = "forge"
 mandatory = false
 type = "optional"
-versionRange = "${forge_version_range}"
-ordering = "NONE"
-side = "BOTH"
-
-# NeoForge Dependency
-[[dependencies.TaterLib]]
-modId = "neoforge"
-mandatory = false
-versionRange = "${neo_version_range}"
+versionRange = "[30,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -227,24 +217,186 @@ side = "BOTH"
 	assert.Nil(t, err)
 
 	assert.Equal(t, "javafml", forgeMod.ModLoader)
-	assert.Equal(t, "${loader_version_range}", forgeMod.LoaderVersion)
-	assert.Equal(t, "${license}", forgeMod.License)
-	assert.Equal(t, "${issue_tracker_url}", forgeMod.IssueTrackerURL)
+	assert.Equal(t, "[1,)", forgeMod.LoaderVersion)
+	assert.Equal(t, "GPL-3.0", forgeMod.License)
+	assert.Equal(t, "https://some.issue.tracker", forgeMod.IssueTrackerURL)
 	assert.Equal(t, 1, len(forgeMod.Mods))
-	assert.Equal(t, "${project_id}", forgeMod.Mods[0].ModID)
-	assert.Equal(t, "${version}", forgeMod.Mods[0].Version)
-	assert.Equal(t, "${project_name}", forgeMod.Mods[0].DisplayName)
-	assert.Equal(t, "${update_json_url}", forgeMod.Mods[0].UpdateJSONURL)
-	assert.Equal(t, "${homepage_url}", forgeMod.Mods[0].DisplayURL)
-	assert.Equal(t, "${project_name}.png.gz", forgeMod.Mods[0].LogoFile)
-	assert.Equal(t, "${authors}", forgeMod.Mods[0].Credits)
-	assert.Equal(t, "${authors}", forgeMod.Mods[0].Authors)
+	assert.Equal(t, "taterlib", forgeMod.Mods[0].ModID)
+	assert.Equal(t, "0.1.0", forgeMod.Mods[0].Version)
+	assert.Equal(t, "TaterLib", forgeMod.Mods[0].DisplayName)
+	assert.Equal(t, "https://some.update.url", forgeMod.Mods[0].UpdateJSONURL)
+	assert.Equal(t, "https://some.homepage.url", forgeMod.Mods[0].DisplayURL)
+	assert.Equal(t, "TaterLib.png.gz", forgeMod.Mods[0].LogoFile)
+	assert.Equal(t, "p0t4t0sandwich", forgeMod.Mods[0].Credits)
+	assert.Equal(t, "p0t4t0sandwich", forgeMod.Mods[0].Authors)
 	assert.Equal(t, "IGNORE_SERVER_VERSION", forgeMod.Mods[0].DisplayTest)
-	assert.Equal(t, "${project_description}", forgeMod.Mods[0].Description)
-	assert.Equal(t, 3, len(forgeMod.Dependencies))
+	assert.Equal(t, "some more word stuffs", forgeMod.Mods[0].Description)
+	assert.Equal(t, 2, len(forgeMod.Dependencies["TaterLib"]))
 	assert.Equal(t, "forge", forgeMod.Dependencies["TaterLib"][0].ModID)
 	assert.Equal(t, false, forgeMod.Dependencies["TaterLib"][0].Mandatory)
-	assert.Equal(t, "${forge_version_range}", forgeMod.Dependencies["TaterLib"][0].VersionRange)
+	assert.Equal(t, "[30,)", forgeMod.Dependencies["TaterLib"][0].VersionRange)
 	assert.Equal(t, "NONE", forgeMod.Dependencies["TaterLib"][0].Ordering)
 	assert.Equal(t, "BOTH", forgeMod.Dependencies["TaterLib"][0].Side)
+}
+
+func TestNeoForgeMod(t *testing.T) {
+	neoForgeModString := `
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "GPL-3.0"
+issueTrackerURL = "https://some.issue.tracker"
+
+[[mods]]
+modId = "taterlib"
+version = "0.1.0"
+displayName = "TaterLib"
+updateJSONURL = "https://some.update.url"
+displayURL = "https://some.home.url"
+logoFile = "TaterLib.png.gz"
+credits = "p0t4t0sandwich"
+authors = "p0t4t0sandwich"
+displayTest = "IGNORE_SERVER_VERSION"
+description = '''some descriptive words'''
+
+[[mixins]]
+config = "taterlib.mixins.v1_20.vanilla.json"
+[[mixins]]
+config = "taterlib.mixins.v1_20_2.vanilla.patch.json"
+[[mixins]]
+config = "taterlib.mixins.v1_20_2.vanilla.json"
+[[mixins]]
+config = "taterlib.mixins.v1_20_6.vanilla.patch.json"
+[[mixins]]
+config = "taterlib.mixins.v1_20_6.vanilla.json"
+[[mixins]]
+config = "taterlib.mixins.v1_21.vanilla.json"
+
+# NeoForge Dependency
+[[dependencies.taterlib]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+# Minecraft Dependency
+[[dependencies.taterlib]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"`
+
+	neoForgeMod, err := mcmodmeta.NewNeoForgeMod(neoForgeModString)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, "javafml", neoForgeMod.ModLoader)
+	assert.Equal(t, "[1,)", neoForgeMod.LoaderVersion)
+	assert.Equal(t, "GPL-3.0", neoForgeMod.License)
+	assert.Equal(t, "https://some.issue.tracker", neoForgeMod.IssueTrackerURL)
+	assert.Equal(t, 1, len(neoForgeMod.Mods))
+	assert.Equal(t, "taterlib", neoForgeMod.Mods[0].ModID)
+	assert.Equal(t, "0.1.0", neoForgeMod.Mods[0].Version)
+	assert.Equal(t, "TaterLib", neoForgeMod.Mods[0].DisplayName)
+	assert.Equal(t, "https://some.update.url", neoForgeMod.Mods[0].UpdateJSONURL)
+	assert.Equal(t, "https://some.home.url", neoForgeMod.Mods[0].DisplayURL)
+	assert.Equal(t, "TaterLib.png.gz", neoForgeMod.Mods[0].LogoFile)
+	assert.Equal(t, "p0t4t0sandwich", neoForgeMod.Mods[0].Credits)
+	assert.Equal(t, "p0t4t0sandwich", neoForgeMod.Mods[0].Authors)
+	assert.Equal(t, "IGNORE_SERVER_VERSION", neoForgeMod.Mods[0].DisplayTest)
+	assert.Equal(t, "some descriptive words", neoForgeMod.Mods[0].Description)
+	assert.Equal(t, 6, len(neoForgeMod.Mixins))
+	assert.Equal(t, "taterlib.mixins.v1_20.vanilla.json", neoForgeMod.Mixins[0].Config)
+	assert.Equal(t, 2, len(neoForgeMod.Dependencies["taterlib"]))
+	assert.Equal(t, "neoforge", neoForgeMod.Dependencies["taterlib"][0].ModID)
+	assert.Equal(t, "required", neoForgeMod.Dependencies["taterlib"][0].Type)
+	assert.Equal(t, "${neo_version_range}", neoForgeMod.Dependencies["taterlib"][0].VersionRange)
+	assert.Equal(t, "NONE", neoForgeMod.Dependencies["taterlib"][0].Ordering)
+	assert.Equal(t, "BOTH", neoForgeMod.Dependencies["taterlib"][0].Side)
+}
+
+func TestSpongeDeserialization(t *testing.T) {
+	spongeString := `{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GPL-3.0",
+  "plugins": [
+    {
+      "id": "taterlib",
+      "entrypoint": "dev.neuralnexus.taterloader.platforms.Sponge8LoaderPlugin",
+      "name": "TaterLib",
+      "description": "some more rando descripto words",
+      "version": "0.1.0",
+      "branding": {},
+      "links": {
+        "homepage": "https://some.homepage",
+        "source": "https://some.repo",
+        "issues": "https://some.issue.tracker"
+      },
+      "dependencies": [
+        {
+          "id": "spongeapi",
+          "version": "8.0.0",
+          "load-order": "after",
+          "optional": false
+        }
+      ]
+    }
+  ]
+}`
+
+	spongePlugin, err := mcmodmeta.NewSpongePlugin(spongeString)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, "java_plain", spongePlugin.Loader.Name)
+	assert.Equal(t, "1.0", spongePlugin.Loader.Version)
+	assert.Equal(t, "GPL-3.0", spongePlugin.License)
+	assert.Equal(t, 1, len(spongePlugin.Plugins))
+	assert.Equal(t, "taterlib", spongePlugin.Plugins[0].ID)
+	assert.Equal(t, "dev.neuralnexus.taterloader.platforms.Sponge8LoaderPlugin", spongePlugin.Plugins[0].Entrypoint)
+	assert.Equal(t, "TaterLib", spongePlugin.Plugins[0].Name)
+	assert.Equal(t, "some more rando descripto words", spongePlugin.Plugins[0].Description)
+	assert.Equal(t, "0.1.0", spongePlugin.Plugins[0].Version)
+	assert.Equal(t, mcmodmeta.SpongeBranding{}, spongePlugin.Plugins[0].Branding)
+	assert.Equal(t, "https://some.homepage", spongePlugin.Plugins[0].Links.Homepage)
+	assert.Equal(t, "https://some.repo", spongePlugin.Plugins[0].Links.Source)
+	assert.Equal(t, "https://some.issue.tracker", spongePlugin.Plugins[0].Links.Issues)
+	assert.Equal(t, 1, len(spongePlugin.Plugins[0].Dependencies))
+	assert.Equal(t, "spongeapi", spongePlugin.Plugins[0].Dependencies[0].ID)
+	assert.Equal(t, "8.0.0", spongePlugin.Plugins[0].Dependencies[0].Version)
+	assert.Equal(t, "after", spongePlugin.Plugins[0].Dependencies[0].LoadOrder)
+	assert.Equal(t, false, spongePlugin.Plugins[0].Dependencies[0].Optional)
+}
+
+func TestVelocityDeserialization(t *testing.T) {
+	velocityString := `{
+  "id": "taterlib",
+  "name": "TaterLib",
+  "version": "0.1.0",
+  "description": "some words are here",
+  "url": "https://some.homepage",
+  "authors": [
+    "p0t4t0sandwich"
+  ],
+  "dependencies": [],
+  "main": "dev.neuralnexus.taterloader.platforms.VelocityLoaderPlugin"
+}`
+
+	velocityPlugin, err := mcmodmeta.NewVelocityPlugin(velocityString)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, "taterlib", velocityPlugin.ID)
+	assert.Equal(t, "TaterLib", velocityPlugin.Name)
+	assert.Equal(t, "0.1.0", velocityPlugin.Version)
+	assert.Equal(t, "some words are here", velocityPlugin.Description)
+	assert.Equal(t, "https://some.homepage", velocityPlugin.URL)
+	assert.Equal(t, 1, len(velocityPlugin.Authors))
+	assert.Equal(t, "p0t4t0sandwich", velocityPlugin.Authors[0])
+	assert.Equal(t, 0, len(velocityPlugin.Dependencies))
+	assert.Equal(t, "dev.neuralnexus.taterloader.platforms.VelocityLoaderPlugin", velocityPlugin.Main)
 }

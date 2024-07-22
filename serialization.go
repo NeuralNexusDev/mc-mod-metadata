@@ -147,7 +147,7 @@ type ForgeLegacyMod struct {
 // NewForgeLegacyMod creates a new ForgeLegacyMod struct from the mcmod.info file
 func NewForgeLegacyMod(mcmodInfoJSON string) ([]*ForgeLegacyMod, error) {
 	mod := []*ForgeLegacyMod{}
-	err := json.Unmarshal([]byte(mcmodInfoJSON), mod)
+	err := json.Unmarshal([]byte(mcmodInfoJSON), &mod)
 	if err != nil {
 		return nil, err
 	}
@@ -223,6 +223,66 @@ type (
 func NewForgeMod(modsTOML string) (*ForgeMod, error) {
 	mod := &ForgeMod{}
 	err := toml.Unmarshal([]byte(modsTOML), mod)
+	if err != nil {
+		return nil, err
+	}
+	return mod, nil
+}
+
+type (
+	// NeoForgeMod is a struct that represents the META-INF/neoforge.mods.toml file of a NeoForge mod
+	NeoForgeMod struct {
+		// Mandatory non-mod-specific properties
+		ModLoader     string `toml:"modLoader"`
+		LoaderVersion string `toml:"loaderVersion"`
+		License       string `toml:"license"`
+
+		// Optional non-mod-specific properties
+		ShowAsResourcePack bool `toml:"showAsResourcePack"`
+		Properties         map[string]interface{}
+		IssueTrackerURL    string `toml:"issueTrackerURL"`
+
+		Mods   []NeoForgeModInfo
+		Mixins []struct {
+			Config string `toml:"config"`
+		} `toml:"mixins"`
+		Dependencies map[string][]NeoForgeModDependency
+	}
+
+	// NeoForgeModInfo is a struct that represents a mod in a NeoForge mod
+	NeoForgeModInfo struct {
+		// Required properties
+		ModID string `toml:"modId"`
+
+		// Optional Mod Properties
+		Namespace     string                 `toml:"namespace"`
+		Version       string                 `toml:"version"`
+		DisplayName   string                 `toml:"displayName"`
+		Description   string                 `toml:"description"`
+		LogoFile      string                 `toml:"logoFile"`
+		LogoBlur      bool                   `toml:"logoBlur"`
+		UpdateJSONURL string                 `toml:"updateJSONURL"`
+		ModProperties map[string]interface{} `toml:"modProperties"`
+		Credits       string                 `toml:"credits"`
+		Authors       string                 `toml:"authors"`
+		DisplayURL    string                 `toml:"displayURL"`
+		DisplayTest   string                 `toml:"displayTest"`
+	}
+
+	// NeoForgeModDependency is a struct that represents a dependency of a NeoForge mod
+	NeoForgeModDependency struct {
+		ModID        string `toml:"modId"`
+		Type         string `toml:"type"`
+		VersionRange string `toml:"versionRange"`
+		Ordering     string `toml:"ordering"`
+		Side         string `toml:"side"`
+	}
+)
+
+// NewNeoForgeMod creates a new NeoForgeMod struct from the neoforge.mods.toml file
+func NewNeoForgeMod(neoforgeModsTOML string) (*NeoForgeMod, error) {
+	mod := &NeoForgeMod{}
+	err := toml.Unmarshal([]byte(neoforgeModsTOML), mod)
 	if err != nil {
 		return nil, err
 	}
