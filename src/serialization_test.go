@@ -63,62 +63,56 @@ softdepends: [ LuckPerms ]
 
 func TestFabricDeserialization(t *testing.T) {
 	fabricString := `{
-	"schemaVersion": 1,
-  "id": "taterlib",
-  "version": "0.1.0",
-  "name": "TaterLib",
-  "description": "some words stuffs",
-  "authors": [
-    {
-      "name": "p0t4t0sandwich",
-      "contact": {
-        "sources": "https://github.com/p0t4t0sandwich/",
-        "homepage": "https://links.sperrer.ca/"
-      }
+"schemaVersion": 1,
+"id": "taterlib",
+"version": "0.1.0",
+"name": "TaterLib",
+"description": "some words stuffs",
+"authors": [
+  {
+	"name": "p0t4t0sandwich",
+	"contact": {
+	  "sources": "https://github.com/p0t4t0sandwich/",
+	  "homepage": "https://links.sperrer.ca/"
     }
-  ],
-  "contact": {
-    "repo": "https://some.repo.url"
   },
-  "license": "GPL-3.0",
-  "icon": "TaterLib.png.gz",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "dev.neuralnexus.taterloader.platforms.FabricLoaderPlugin"
-    ]
-  },
-  "mixins": [
-    "taterlib.mixins.v1_7_10.fabric.json",
-    "taterlib.mixins.v1_8_9.fabric.json",
-    "taterlib.mixins.v1_9_4.fabric.json",
-    "taterlib.mixins.v1_10_2.fabric.json",
-    "taterlib.mixins.v1_11_2.fabric.json",
-    "taterlib.mixins.v1_12_2.fabric.json",
-    "taterlib.mixins.v1_14_4.fabric.json",
-    "taterlib.mixins.v1_15.fabric.json",
-    "taterlib.mixins.v1_16.fabric.json",
-    "taterlib.mixins.v1_17.fabric.json",
-    "taterlib.mixins.v1_18.fabric.json",
-    "taterlib.mixins.v1_19.fabric.json",
-    "taterlib.mixins.v1_19_1.fabric.json",
-    "taterlib.mixins.v1_19_1.fabric.patch.json",
-    "taterlib.mixins.v1_19_3.fabric.patch.json",
-    "taterlib.mixins.v1_19_4.fabric.patch.json",
-    "taterlib.mixins.v1_20.fabric.json",
-    "taterlib.mixins.v1_20_2.fabric.json",
-    "taterlib.mixins.v1_20_2.fabric.patch.json",
-    "taterlib.mixins.v1_20_6.fabric.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.9.0",
-    "minecraft": "*"
-  },
-  "suggests": {
-    "fabric-api-base": "*",
-    "legacy-fabric-api-base": "*",
-    "luckperms": "*"
+  "apple"
+],
+"contact": {
+  "repo": "https://some.repo.url"
+},
+"license": "GPL-3.0",
+"icon": "TaterLib.png.gz",
+"environment": "*",
+"entrypoints": {
+  "main": [
+	"dev.neuralnexus.taterloader.platforms.FabricLoaderPlugin"
+  ]
+},
+"mixins": [
+  "taterlib.mixins.v1_7_10.fabric.json"
+],
+"accessWidener": "taterlib.accesswidener",
+"depends": {
+  "fabricloader": ">=0.9.0",
+  "minecraft": "*"
+},
+"suggests": {
+  "fabric-api-base": "*",
+  "legacy-fabric-api-base": "*",
+  "luckperms": "*"
+},
+"breaks": {
+  "taterlib": "0.0.1"
+},
+"custom": {
+  "some": {}
+},
+"jars": [
+  {
+	"file": "META-INF/jars/thing-0.1.0.jar"
   }
+]
 }`
 	fabricMod, err := mcmodmeta.NewFabricMod(fabricString)
 
@@ -129,8 +123,8 @@ func TestFabricDeserialization(t *testing.T) {
 	assert.Equal(t, "0.1.0", fabricMod.Version)
 	assert.Equal(t, "TaterLib", fabricMod.Name)
 	assert.Equal(t, "some words stuffs", fabricMod.Description)
-	assert.Equal(t, 1, len(fabricMod.Authors))
-	assert.Equal(t, "p0t4t0sandwich", fabricMod.Authors[0].Name)
+	assert.Equal(t, 2, len(fabricMod.Authors))
+	assert.Equal(t, "p0t4t0sandwich", fabricMod.Authors[0].(mcmodmeta.FabricPerson).Name)
 }
 
 func TestForgeLegacyMod(t *testing.T) {

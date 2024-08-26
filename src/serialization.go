@@ -89,8 +89,8 @@ type (
 		// Optional fields - Metadata
 		Name         string                   `json:"name"`
 		Description  string                   `json:"description"`
-		Authors      []FabricPerson           `json:"authors"`
-		Contributors []FabricPerson           `json:"contributors"`
+		Authors      []any                    `json:"authors"` // The spec is not enforced, so it can be anything or a FabricPerson
+		Contributors []any                    `json:"contributors"`
 		Contact      FabricContactInformation `json:"contact"`
 		License      string                   `json:"license"` // Can also be a list, will ignore for this implementation
 		Icon         string                   `json:"icon"`    // Can also be a map, will ignore for this implementation
@@ -119,6 +119,22 @@ func NewFabricMod(fabricModJSON string) (*FabricMod, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Now to convert the authors and contributors to FabricPerson structs
+	// The common case is that they are strings
+	// If they are not strings, they are probably already FabricPerson structs
+	for i, author := range mod.Authors {
+		if authorStr, ok := author.(string); ok {
+			mod.Authors[i] = FabricPerson{Name: authorStr}
+		}
+		if authorMap, ok := author.(map[string]interface{}); ok {
+			authorStruct := FabricPerson{}
+			mapJson, _ := json.Marshal(authorMap)
+			json.Unmarshal(mapJson, &authorStruct)
+			mod.Authors[i] = authorStruct
+
+		}
+	}
+
 	return mod, nil
 }
 
