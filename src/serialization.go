@@ -76,15 +76,15 @@ type (
 			File string `json:"file"`
 		} `json:"jars"`
 		LanguageAdapters map[string]string `json:"languageAdapters"`
-		Mixins           []string          `json:"mixins"`
+		Mixins           []any             `json:"mixins"` // Can be a list of strings or {config: string, environment: string}
 		AccessWidener    string            `json:"accessWidener"`
 
 		// Optional fields - Dependency Resolution
-		Depends    map[string]string `json:"depends"`
-		Recommends map[string]string `json:"recommends"`
-		Suggests   map[string]string `json:"suggests"`
-		Conflicts  map[string]string `json:"conflicts"`
-		Breaks     map[string]string `json:"breaks"`
+		Depends    map[string]any `json:"depends"` // Can be a string or a list of strings
+		Recommends map[string]any `json:"recommends"`
+		Suggests   map[string]any `json:"suggests"`
+		Conflicts  map[string]any `json:"conflicts"`
+		Breaks     map[string]any `json:"breaks"`
 
 		// Optional fields - Metadata
 		Name         string                   `json:"name"`

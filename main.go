@@ -61,8 +61,6 @@ func readZipPart(file *zip.File) (string, error) {
 				return "", err
 			}
 
-			fmt.Printf("%s\n", fileStr)
-
 			plugin, err := mcmodmeta.NewFabricMod(fileStr)
 			if err != nil {
 				fmt.Println(err)
