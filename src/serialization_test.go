@@ -1,7 +1,7 @@
 package mcmodmeta_test
 
 import (
-	mcmodmeta "mc-mod-metadata"
+	mcmodmeta "mc-mod-metadata/src"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
